@@ -1,9 +1,9 @@
 import enum
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, create_engine, DateTime, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, create_engine, DateTime, Enum, select
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker, select
+from sqlalchemy.orm import relationship, sessionmaker
 from app.db.session import AsyncSession
 from datetime import datetime as dt
 
