@@ -1,9 +1,8 @@
 import enum
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, create_engine, DateTime, Enum, select
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, select
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, declarative_base
 from app.db.session import AsyncSession
 from datetime import datetime as dt
 
@@ -52,8 +51,6 @@ class User(Base):
     roles = Column(ARRAY(Enum(UserRoles)), nullable=False, default=[UserRoles.user])
     email = Column(String, unique=True, index=True)
     
-    reviews = relationship("Review", back_populates="user")
-    cart_items = relationship("CartItem", back_populates="user")
     user_tokens = relationship("UserToken", back_populates="user")
 
 

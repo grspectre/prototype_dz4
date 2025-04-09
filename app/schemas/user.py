@@ -21,8 +21,6 @@ class UserUpdate(BaseModel):
 class UserRead(UserBase):
     user_id: UUID4
     roles: List[UserRoles]
-    created_at: datetime
-    updated_at: datetime
 
     model_config = ConfigDict(
         from_attributes=True,
