@@ -1,10 +1,16 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from fastapi import FastAPI
+
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+)
+
 from app.core.config import settings
 from app.api.api import api_router
-from fastapi import Request
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -22,4 +28,5 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
