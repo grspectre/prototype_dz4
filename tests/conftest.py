@@ -1,11 +1,11 @@
 import pytest
 import os
+import sys
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.db.base import Base, UserToken, User
 from app.main import app
 from app.db.session import get_db
@@ -14,8 +14,8 @@ from app.core.security import create_access_token, get_password_hash
 from datetime import timedelta
 from sqlalchemy import select
 
-if 'DATABASE_URL' in os.environ:
-    TEST_DATABASE_URL = os.environ['DATABASE_URL']
+if "DATABASE_URL" in os.environ:
+    TEST_DATABASE_URL = os.environ["DATABASE_URL"]
 else:
     TEST_DATABASE_URL = "postgresql+asyncpg://pws:pws@localhost:5432/db_dz_test"
 
@@ -45,20 +45,24 @@ async def async_session(async_engine):
 @pytest.fixture(scope="function")
 async def override_get_db(async_session):
     """Override the get_db dependency to use the test session."""
+
     async def _override_get_db():
         try:
             yield async_session
         finally:
             await async_session.commit()  # Commit any changes for the test
-    
+
     return _override_get_db
+
 
 @pytest.fixture(scope="function")
 async def async_client(app, override_get_db):
     """Create an async client for testing."""
     app.dependency_overrides[get_db] = override_get_db
     # For httpx AsyncClient to test against a FastAPI app
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         client.app = app
         yield client
     app.dependency_overrides = {}
@@ -68,6 +72,7 @@ async def async_client(app, override_get_db):
 def app() -> FastAPI:
     """Create a FastAPI app instance for testing."""
     from app.main import app
+
     return app
 
 
@@ -92,22 +97,21 @@ async def session_user_token(async_session: AsyncSession) -> str:
         email = "test_session@example.com"
         passwd = "testpassword"
         hashed_password, salt = get_password_hash(passwd)
-        
+
         db_user = User(
             username=login,
             email=email,
             name="test_session",
             last_name="test_session",
             password=hashed_password,
-            salt=salt
+            salt=salt,
         )
-        
+
         async_session.add(db_user)
         await async_session.commit()
         await async_session.refresh(db_user)
-        
+
         access_token_expires = timedelta(hours=2)
-        
 
     query = select(UserToken).where(UserToken.user_id == db_user.user_id)
     response = await async_session.execute(query)
@@ -115,14 +119,14 @@ async def session_user_token(async_session: AsyncSession) -> str:
 
     if token is None:
         access_token, expires_at = create_access_token(
-            data={"sub": str(db_user.user_id), "roles": [role.value for role in db_user.roles]},
-            expires_delta=access_token_expires
+            data={
+                "sub": str(db_user.user_id),
+                "roles": [role.value for role in db_user.roles],
+            },
+            expires_delta=access_token_expires,
         )
-        
-        token = UserToken(
-            user_id=db_user.user_id,
-            expired_at=expires_at
-        )
+
+        token = UserToken(user_id=db_user.user_id, expired_at=expires_at)
         async_session.add(token)
         await async_session.commit()
         await async_session.refresh(token)
@@ -143,16 +147,16 @@ async def session_user(async_session: AsyncSession) -> User:
         email = "test_session@example.com"
         passwd = "testpassword"
         hashed_password, salt = get_password_hash(passwd)
-        
+
         db_user = User(
             username=login,
             email=email,
             name="test_session",
             last_name="test_session",
             password=hashed_password,
-            salt=salt
+            salt=salt,
         )
-        
+
         async_session.add(db_user)
         await async_session.commit()
         await async_session.refresh(db_user)

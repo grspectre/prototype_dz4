@@ -2,11 +2,10 @@ import pytest
 import pytest_asyncio
 import datetime
 import string
-from uuid import uuid4, UUID
+from uuid import uuid4
 from unittest.mock import AsyncMock, MagicMock, patch
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi import HTTPException
 
 from app.db.base import User, UserToken
 from app.core.security import (
